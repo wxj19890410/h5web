@@ -16,7 +16,7 @@
           <div>获取明细 》》 </div>
         </router-link>
       </div>
-     
+
       <div style="display:flex;position:relative;">
       <div style="position:absolute;top:105px;left:30%;font-size:25px;color:#fff;z-index:9999999;">208</div>
         <div id="myChart" :style="{width: '70%', height: '200px'}"></div>
@@ -31,7 +31,7 @@
           <div style="transform:scale(1,1);width:50%;">我的名次</div>
           <div style="transform:scale(1,1);width:50%;">企业平均值</div>
         </div>
-        
+
       </div>
       <div style="padding:10px 0px 20px 0;background-color:#fff;">
         <div style="display:flex;line-height:20px;background-color:#fff;" v-for="item in table">
@@ -150,11 +150,11 @@ export default {
     }
   },
   create(){
-    
+
   },
   mounted(){
     this.codeId = this.$route.query.code
-    this.getInfo()
+    this.getloadInfo()
     // this.$store.commit('setLoginUuid', this.$route.query.code);
     // this.init()
     // this.myHistoryData()
@@ -162,44 +162,15 @@ export default {
     this.drawLine();
   },
   methods: {
-    getuserdetail() {
-      const params3= {}
-      params3.access_token= this.access_token
-      params3.userid= this.userId
-      this.$http.get('/wx/user/get', {params: params3}).then(({ data }) => {
-        if (data && data.errcode ===0) {
-          this.userName = data.name
-          this.avatar = data.avatar
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
-    },
-    getuserinfo() {
-      const params2= {}
-      params2.access_token= this.access_token
-      params2.code= this.codeId
-      this.$http.get('/wx/user/getuserinfo', {params: params2}).then(({ data }) => {
+    getloadInfo() {
+      const params= {}
+      params.codeId= this.codeId
+      this.$http.get('/huoli/mobile/loadInfo', {params: params}).then(({ data }) => {
         if (data) {
-          this.userId = data.UserId
-          this.getuserdetail()
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
-    },
-    getInfo() {
-      this.$http.get('/wx/gettoken', {params: window.GLOBLE.params}).then(({ data }) => {
-        if (data && data.errcode ===0) {
-          this.access_token = data.access_token
-          this.getuserinfo()
-          
+          if(data.userInfo){
+            this.userName = data.userInfo.name
+            this.avatar = data.userInfo.avatar
+          }
         } else {
           this.$message({
             type: 'error',
@@ -212,7 +183,7 @@ export default {
       //个人历史数据
       this.$http.get('/mobile/myHistoryData').then(({ data }) => {
           if (data) {
-           
+
             console.log(data)
           } else {
             this.$message({
@@ -228,7 +199,7 @@ export default {
      //本月企业名
       this.$http.get('/mobile/historyData',{params: params}).then(({ data }) => {
           if (data) {
-           
+
             console.log(data)
           } else {
             this.$message({
@@ -244,7 +215,7 @@ export default {
       //获取个人信息  扇形图  条形图数据
       this.$http.get('/mobile/getInfos',{params: params}).then(({ data }) => {
           if (data) {
-           
+
             console.log(data)
           } else {
             this.$message({
@@ -271,13 +242,13 @@ export default {
             },
             left:15,
             top:18,
-            
+
         },
         tooltip : {
             trigger: 'item',
             formatter: "{a} <br/>{b} : {c} ({d}%)"
         },
-        
+
         series : [
             {
                 name: '访问来源',
@@ -304,8 +275,8 @@ export default {
                       color:"#23649E",
                     }},
                 ],
-                
-                 
+
+
                 itemStyle: {
                     emphasis: {
                         show: true,
@@ -317,7 +288,7 @@ export default {
                     normal: {
                         shadowBlur: 0,
                         shadowColor: 'rgba(0, 0, 0, 0.5)',
-                      
+
                     }
                 },
                 labelLine: {
@@ -387,7 +358,7 @@ export default {
         this.dataNum = this.dataNum5
       }else if(index==5){
         this.dataNum = this.dataNum6
-      } 
+      }
       this.drawLine();
     },
     handleCommand(command) {

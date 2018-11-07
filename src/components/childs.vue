@@ -12,50 +12,47 @@
 		    stripe
 		    >
 		    <el-table-column
-		      prop="date"
+		      prop="month"
 		      width="85%"
 		      label="日期">
 		    </el-table-column>
-		    
+
 		    <el-table-column
-		      prop="address"
+		      prop="study"
 		      width="45%"
 		      label="学习成长">
 		    </el-table-column>
 		    <el-table-column
-		      prop="address"
+		      prop="read"
 		      width="45%"
 		      label="读书指数">
 		    </el-table-column>
 		    <el-table-column
-		      prop="address"
+		      prop="culture"
 		      width="45%"
 		      label="企业文化">
 		    </el-table-column>
 		    <el-table-column
-		      prop="address"
+		      prop="attendance"
 		      width="45%"
 		      label="出勤指数">
 		     </el-table-column>
 		      <el-table-column
-		      prop="address"
+		      prop="hse"
 		      width="45%"
 		      label="HSE">
 		    </el-table-column>
 		    <el-table-column
-		      prop="address"
+		      prop="improve"
 		      width="45%"
 		      label="精益改善">
 		    </el-table-column>
 		    <el-table-column
-		      prop="address"
+		      prop="total"
 		      width="45%"
 		      label="总指数">
 		    </el-table-column>
 		</el-table>
-		<div>
-			<ul><li>日期</li><li>日期</li><li>日期</li><li>日期</li><li>日期</li></ul>
-		</div>
 		</div>
 	</div>
 </template>
@@ -63,31 +60,14 @@
 export default {
     data() {
       return {
-        tableData: [{
-          date: '2016/05/02',
-          name: '王小虎',
-          address: '11'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '15'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '15'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '15'
-        }]
+        tableData: []
       }
     },
     methods: {
 	    async initData () {
-	    	this.$http.get('/mobile/getHistoryData').then(({ data }) => {
+	    	this.$http.get('/huoli/mobile/myHistoryData').then(({ data }) => {
 	            if (data) {
-	             
-	              console.log(data)
+                this.tableData = data
 	            } else {
 	              this.$message({
 	                type: 'error',

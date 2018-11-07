@@ -17,7 +17,7 @@ Vue.use(ElementUI);
 // 引入echarts
 import echarts from 'echarts'
 
-Vue.prototype.$echarts = echarts 
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 
@@ -27,7 +27,7 @@ Vue.prototype.$service = service
 Vue.http.options.emulateJSON = true
 Vue.http.interceptors.push((request, next) => {
   // request.url = window.GLOBLE.apiUrl + request.url
-  request.params.openId =  store.state.loginUuid
+  request.params.userid =  store.state.userid
   console.log(request.params)
   next(response => {
     let result = {

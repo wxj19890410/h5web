@@ -2,11 +2,11 @@
   <div class="hello">
     <div class="top">活力指数</div>
     <div class="header">
-      <div class="header-img"><img :src="avatar"></div>
+      <div class="header-img"><img :src="userInfo.avatar"></div>
       <div class="header-product">
         <div style="font-size:14px;color:#4F77AB;">正式员工</div>
-        <div style="font-size:16px;">{{userName}}</div>
-        <div style="font-size:12px;color:#949494;">codeId:{{codeId}}</div>
+        <div style="font-size:16px;">{{userInfo.name}}</div>
+        <div style="font-size:12px;color:#949494;">ID:{{userInfo.mobile}}</div>
       </div>
     </div>
     <div class="echats-bing">
@@ -21,8 +21,8 @@
       <div style="position:absolute;top:105px;left:30%;font-size:25px;color:#fff;z-index:9999999;">208</div>
         <div id="myChart" :style="{width: '70%', height: '200px'}"></div>
         <div style="background-color:#fff;color:#747474;width:30%;">
-          <div style="font-size:15px;margin-top:20px;">上月排名：</div><div style="margin-top:10px;"><span class="font">88</span>/300</div>
-          <div style="margin-top:10px;">公司平均值：<div class="font">300</div></div>
+          <div style="font-size:15px;margin-top:20px;">上月排名：</div><div style="margin-top:10px;"><span class="font">{{detailData.rank}}</span>/{{detailData.personNub}}</div>
+          <div style="margin-top:10px;">公司平均值：<div class="font">{{detailData.averTotal}}</div></div>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;color:#5B88B3;background-color:#fff;margin-top:10px;padding-top:10px;">
@@ -31,14 +31,13 @@
           <div style="transform:scale(1,1);width:50%;">我的名次</div>
           <div style="transform:scale(1,1);width:50%;">企业平均值</div>
         </div>
-
       </div>
       <div style="padding:10px 0px 20px 0;background-color:#fff;">
         <div style="display:flex;line-height:20px;background-color:#fff;" v-for="item in table">
           <div class="table-name">{{item.name}}</div>
           <div style="width:15%;color:#5B88B3;">{{item.num1}}</div>
           <div style="width:50%;margin:5px 0;">
-          <el-progress :text-inside="true" :stroke-width="5" :percentage="item.per" :color="item.color" :show-text="false"></el-progress></div>
+          <el-progress :text-inside="true" :stroke-width="5" :percentage = "item.per?item.per:0" :color="item.color" :show-text="false"></el-progress></div>
           <div style="width:25%;color:#5B88B3;">{{item.num2}}</div>
           <div style="width:25%;color:#5B88B3;">{{item.num3}}</div>
         </div>
@@ -46,36 +45,32 @@
     </div>
     <div id="myChart2" :style="{width: '100%', height: '280px'}" style="margin-top:10px;"></div>
     <div style="padding:0 20px;background-color:#fff;margin-bottom:10px;padding-bottom:30px;">
-      <div class="button" v-for="(item,index) in tab" @click="tabNum(index)">{{item}}</div>
+      <div class="button" v-for="(item,index) in tab" @click="tabNum(item.id)">{{item.name}}</div>
     </div>
     <div class="paiming">
       <div style="background-color:#F7FAFA;font-size:16px;padding:10px 0;">上月活力指数排名</div>
       <div style="display:flex;width:100%;justify-content:center;margin-bottom:30px;">
-        <div class="paihangTab" @click="bang(5)">公司总排行榜</div>
+        <div class="paihangTab" @click="getAverData()">公司总排行榜</div>
         <el-dropdown @command="handleCommand" class="paihangTab">
           <span class="el-dropdown-link" >
-            生产部门<i class="el-icon-arrow-down el-icon--right"></i>
+            部门<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="a">生产部门1</el-dropdown-item>
-            <el-dropdown-item command="b">生产部门2</el-dropdown-item>
-            <el-dropdown-item command="c">生产部门3</el-dropdown-item>
+            <el-dropdown-item :command="item.id" :key="index" v-for="(item,index) in deptList">{{item.name}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-dropdown @command="handleCommand2" class="paihangTab">
           <span class="el-dropdown-link" >
-            非生产部门<i class="el-icon-arrow-down el-icon--right"></i>
+            组织<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="a">非生产部门1</el-dropdown-item>
-            <el-dropdown-item command="b">非生产部门2</el-dropdown-item>
-            <el-dropdown-item command="c">非生产部门3</el-dropdown-item>
+            <el-dropdown-item :command="item.id" :key="index"  v-for="(item,index) in tagList">{{item.name}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
       <div></div>
       <el-table
-        :data="tableData5"
+        :data="tableData"
         stripe
         row-key="id"
         :expand-row-keys="expands"
@@ -85,29 +80,29 @@
           <template slot-scope="props">
             <el-form label-position="left" inline class="demo-table-expand">
               <el-form-item label="企业文化">
-                <span>{{ props.row.zhishu1 }}</span>
+                <span>{{ props.row.culture }}</span>
               </el-form-item>
               <el-form-item label="学习成长">
-                <span>{{ props.row.zhishu2 }}</span>
+                <span>{{ props.row.study }}</span>
               </el-form-item>
               <el-form-item label="精益改善">
-                <span>{{ props.row.zhishu3 }}</span>
+                <span>{{ props.row.improve }}</span>
               </el-form-item>
               <el-form-item label="HSE">
-                <span>{{ props.row.zhishu4 }}</span>
+                <span>{{ props.row.hse }}</span>
               </el-form-item>
               <el-form-item label="出勤指数">
-                <span>{{ props.row.zhishu5 }}</span>
+                <span>{{ props.row.attendance }}</span>
               </el-form-item>
               <el-form-item label="读书指数">
-                <span>{{ props.row.zhishu6 }}</span>
+                <span>{{ props.row.read }}</span>
               </el-form-item>
             </el-form>
           </template>
         </el-table-column>
         <el-table-column
           label="排名"
-          prop="id">
+          prop="rank">
         </el-table-column>
         <el-table-column
           label="员工"
@@ -115,7 +110,7 @@
         </el-table-column>
         <el-table-column
           label="总指数"
-          prop="desc">
+          prop="total">
         </el-table-column>
       </el-table>
     </div>
@@ -123,29 +118,28 @@
 </template>
 
 <script>
+const culture = {name:"企业文化",num1:0,num2:0, num3:0,color:"#B23331", per: 0}
+const study = {name:"学习成长",num1:0,num2:0, num3:0,color:"#2E3E4C", per: 0}
+const improve = {name:"精益改善",num1:0,num2:0, num3:0,color:"#60979F", per: 0}
+const hse = {name:"HSE",num1:0,num2:0, num3:0,color:"#C87A5E", per: 0}
+const attendance = {name:"出勤指数",num1:0,num2:0, num3:0,color:"#8EC0A6", per: 0}
+const read =  {name:"读书指数",num1:0,num2:0, num3:0,color:"#6F967A", per: 0}
 export default {
   name: 'HelloWorld',
   data () {
     return {
-      access_token: '123',
-      userId: '123',
-      avatar: '/static/header.png',
-      userName: '123',
+      xAxisData: ['1', '2', '3', '4', '5', '6', '7','8','9','10','11','12'],
+      msHistoryData: [],
+      userInfo: {avatar: '/static/header.png'},
       codeId: null,
-      table:[{name:"企业文化",num1:22,num2:30, num3:100,color:"#B23331",per:30},{name:"学习成长",num1:22,num2:40, num3:100,color:"#2E3E4C",per:40},{name:"精益改善",num1:22,num2:50, num3:100,color:"#60979F",per:50},{name:"HSE",num1:22,num2:60, num3:100,color:"#C87A5E",per:60},{name:"出勤指数",num1:22,num2:70, num3:100,color:"#8EC0A6",per:70},{name:"读书指数",num1:22,num2:80, num3:100,color:"#6F967A",per:80},],
-      dataNum:[82, 93, 90, 93, 12, 13, 13,22,52,25,56,11],
-      dataNum1:[82, 93, 90, 93, 12, 13, 13,22,52,25,56,11],
-      dataNum2:[55, 54, 45, 54, 23, 55, 76,23,54,26,54,11],
-      dataNum3:[82, 93, 90, 93, 12, 13, 13,22,52,25,56,55],
-      dataNum4:[82, 33, 90, 55, 12, 88, 13,22,52,25,56,11],
-      dataNum5:[11, 44, 90, 93, 12, 13, 13,22,52,25,56,11],
-      dataNum6:[82, 93, 55, 93, 77, 13, 44,22,66,76,56,11],
-      tab:['总指数','企业文化','学习成长','精益改善','HSE','出勤指数','读书指数',],
+      detailData: {},
+      table:[],
+      dataNum:[],
+      tab:[{id:'total', name: '总指数'}, {id:'culture', name: '企业文化'}, {id:'study', name: '学习指数'}, {id:'read', name: '读书指数'}, {id:'attendance', name: '出勤指数'}, {id:'improve', name: '精益改善'}, {id:'hse', name: 'HSE'}],
       paiTab:['公司总排行榜','部门指数榜','组织活力榜','生产部门'],
-      tableData5: [{id: '1',name: '张海',desc: '88',zhishu1: '88',zhishu2: '88',zhishu3: '88',zhishu4: '88',zhishu5: '88',zhishu6: '88',}, {id: '2',name: '张海2',desc: '77',zhishu1: '77',zhishu2: '77',zhishu3: '77',zhishu4: '77',zhishu5: '77',zhishu6: '77',}, {id: '3',name: '张海3',desc: '66',zhishu1: '66',zhishu2: '66',zhishu3: '66',zhishu4: '66',zhishu5: '66',zhishu6: '66',}, {id: '4',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '5',name: '张海4',desc: '44',zhishu1: '44',zhishu2: '44',zhishu3: '44',zhishu4: '44',zhishu5: '44',zhishu6: '44',},{id: '6',name: '张海4',desc: '33',zhishu1: '33',zhishu2: '33',zhishu3: '33',zhishu4: '33',zhishu5: '33',zhishu6: '33',},{id: '7',name: '张海4',desc: '22',zhishu1: '22',zhishu2: '22',zhishu3: '22',zhishu4: '22',zhishu5: '22',zhishu6: '22',},{id: '8',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '9',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '10',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},],
-      tableData1: [{id: '1',name: '张海111',desc: '88',zhishu1: '88',zhishu2: '88',zhishu3: '88',zhishu4: '88',zhishu5: '88',zhishu6: '88',}, {id: '2',name: '张海2',desc: '77',zhishu1: '77',zhishu2: '77',zhishu3: '77',zhishu4: '77',zhishu5: '77',zhishu6: '77',}, {id: '3',name: '张海3',desc: '66',zhishu1: '66',zhishu2: '66',zhishu3: '66',zhishu4: '66',zhishu5: '66',zhishu6: '66',}, {id: '4',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '5',name: '张海4',desc: '44',zhishu1: '44',zhishu2: '44',zhishu3: '44',zhishu4: '44',zhishu5: '44',zhishu6: '44',},{id: '6',name: '张海4',desc: '33',zhishu1: '33',zhishu2: '33',zhishu3: '33',zhishu4: '33',zhishu5: '33',zhishu6: '33',},{id: '7',name: '张海4',desc: '22',zhishu1: '22',zhishu2: '22',zhishu3: '22',zhishu4: '22',zhishu5: '22',zhishu6: '22',},{id: '8',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '9',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '10',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},],
-      tableData2: [{id: '1',name: '张海222',desc: '88',zhishu1: '88',zhishu2: '88',zhishu3: '88',zhishu4: '88',zhishu5: '88',zhishu6: '88',}, {id: '2',name: '张海2',desc: '77',zhishu1: '77',zhishu2: '77',zhishu3: '77',zhishu4: '77',zhishu5: '77',zhishu6: '77',}, {id: '3',name: '张海3',desc: '66',zhishu1: '66',zhishu2: '66',zhishu3: '66',zhishu4: '66',zhishu5: '66',zhishu6: '66',}, {id: '4',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '5',name: '张海4',desc: '44',zhishu1: '44',zhishu2: '44',zhishu3: '44',zhishu4: '44',zhishu5: '44',zhishu6: '44',},{id: '6',name: '张海4',desc: '33',zhishu1: '33',zhishu2: '33',zhishu3: '33',zhishu4: '33',zhishu5: '33',zhishu6: '33',},{id: '7',name: '张海4',desc: '22',zhishu1: '22',zhishu2: '22',zhishu3: '22',zhishu4: '22',zhishu5: '22',zhishu6: '22',},{id: '8',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '9',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '10',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},],
-      tableData: [{id: '1',name: '张海',desc: '88',zhishu1: '88',zhishu2: '88',zhishu3: '88',zhishu4: '88',zhishu5: '88',zhishu6: '88',}, {id: '2',name: '张海2',desc: '77',zhishu1: '77',zhishu2: '77',zhishu3: '77',zhishu4: '77',zhishu5: '77',zhishu6: '77',}, {id: '3',name: '张海3',desc: '66',zhishu1: '66',zhishu2: '66',zhishu3: '66',zhishu4: '66',zhishu5: '66',zhishu6: '66',}, {id: '4',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '5',name: '张海4',desc: '44',zhishu1: '44',zhishu2: '44',zhishu3: '44',zhishu4: '44',zhishu5: '44',zhishu6: '44',},{id: '6',name: '张海4',desc: '33',zhishu1: '33',zhishu2: '33',zhishu3: '33',zhishu4: '33',zhishu5: '33',zhishu6: '33',},{id: '7',name: '张海4',desc: '22',zhishu1: '22',zhishu2: '22',zhishu3: '22',zhishu4: '22',zhishu5: '22',zhishu6: '22',},{id: '8',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '9',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},{id: '10',name: '张海4',desc: '55',zhishu1: '55',zhishu2: '55',zhishu3: '55',zhishu4: '55',zhishu5: '55',zhishu6: '55',},],
+      tagList: [],
+      deptList: [],
+      tableData: [],
       expands: []
     }
   },
@@ -155,10 +149,6 @@ export default {
   mounted(){
     this.codeId = this.$route.query.code
     this.getloadInfo()
-    // this.$store.commit('setLoginUuid', this.$route.query.code);
-    // this.init()
-    // this.myHistoryData()
-    // this.historyData()
     this.drawLine();
   },
   methods: {
@@ -168,8 +158,9 @@ export default {
       this.$http.get('/huoli/mobile/loadInfo', {params: params}).then(({ data }) => {
         if (data) {
           if(data.userInfo){
-            this.userName = data.userInfo.name
-            this.avatar = data.userInfo.avatar
+            this.userInfo = data.userInfo
+            this.$store.commit('setUserid', data.userid)
+            this.myHistoryData()
           }
         } else {
           this.$message({
@@ -181,10 +172,79 @@ export default {
     },
     myHistoryData(){
       //个人历史数据
-      this.$http.get('/mobile/myHistoryData').then(({ data }) => {
+      this.$http.get('/huoli/mobile/getInfos').then(({ data }) => {
           if (data) {
+            this.detailData = data.data
+            if(this.detailData.culture){
+              culture.num1 = this.detailData.culture
+              culture.num2 = this.detailData.culture
+              culture.per = this.detailData.culture
+            }
+            if(this.detailData.averCulture){
+              culture.num3 = this.detailData.averCulture
+            }
 
-            console.log(data)
+            if(this.detailData.study){
+              study.num1 = this.detailData.study
+              study.num2 = this.detailData.study
+              study.per = this.detailData.study
+            }
+            if(this.detailData.averStudy){
+              study.num3 = this.detailData.averStudy
+            }
+            if(this.detailData.improve){
+              improve.num1 = this.detailData.improve
+              improve.num2 = this.detailData.improve
+              improve.per = this.detailData.improve
+            }
+            if(this.detailData.averImprove){
+              improve.num3 = this.detailData.averImprove
+            }
+            if(this.detailData.hse){
+              hse.num1 = this.detailData.hse
+              hse.num2 = this.detailData.hse
+              hse.per = this.detailData.hse
+            }
+            if(this.detailData.averHse){
+              hse.num3 = this.detailData.averHse
+            }
+            if(this.detailData.attendance){
+              attendance.num1 = this.detailData.attendance
+              attendance.num2 = this.detailData.attendance
+              attendance.per = this.detailData.attendance
+            }
+            if(this.detailData.averAttendance){
+              attendance.num3 = this.detailData.averAttendance
+            }
+            if(this.detailData.read){
+              read.num1 = this.detailData.read
+              read.num2 = this.detailData.read
+              read.per = this.detailData.read
+            }
+            if(this.detailData.averRead){
+              read.num3 = this.detailData.averRead
+            }
+            this.table.push(culture)
+            this.table.push(study)
+            this.table.push(improve)
+            this.table.push(hse)
+            this.table.push(attendance)
+            this.table.push(read)
+
+            myChart.forEach(item => {
+              if (this.detailData[item.id]) {
+                item.value = this.detailData[item.id]
+              }
+            })
+            //画图
+            this.drawMyChart(myChart)
+            //获取我的历史信息
+            this.getMyHistory()
+
+            //获取机构名称
+            this.getOrgInfo()
+            //获取公司排名
+            this.getAverData()
           } else {
             this.$message({
               type: 'error',
@@ -193,14 +253,23 @@ export default {
           }
        })
     },
-    historyData(){
-      const params = {}
-      params.month = '2018-11'
-     //本月企业名
-      this.$http.get('/mobile/historyData',{params: params}).then(({ data }) => {
+    drawMyChart(params){
+      let myChart = this.$echarts.init(document.getElementById('myChart'))
+      // 绘制图表
+      myChartSet.series[0].data = params
+      myChart.setOption(myChartSet)
+    },
+    getMyHistory(){
+       this.$http.get('/huoli/mobile/myHistoryData').then(({ data }) => {
           if (data) {
-
-            console.log(data)
+            this.msHistoryData = data
+            this.xAxisData = []
+            this.msHistoryData.forEach(item => {
+              if (item.month) {
+                this.xAxisData.push(item.month)
+              }
+            })
+            this.tabNum('total')
           } else {
             this.$message({
               type: 'error',
@@ -208,99 +277,10 @@ export default {
             })
           }
        })
-    },
-    init(){
-      /* const params = {}
-      params.month = '2018-11'
-      //获取个人信息  扇形图  条形图数据
-      this.$http.get('/mobile/getInfos',{params: params}).then(({ data }) => {
-          if (data) {
-
-            console.log(data)
-          } else {
-            this.$message({
-              type: 'error',
-              message: data.message
-            })
-          }
-       }) */
-
-
     },
     drawLine(){
       // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById('myChart'))
       let myChart2 = this.$echarts.init(document.getElementById('myChart2'))
-      // 绘制图表
-      myChart.setOption({
-        backgroundColor: '#fff',
-
-        title : {
-            text: '月活力指数比',
-            textStyle:{
-              fontSize:16,
-            },
-            left:15,
-            top:18,
-
-        },
-        tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-
-        series : [
-            {
-                name: '访问来源',
-                type: 'pie',
-                radius : '55%',
-                center: ['50%', '60%'],
-                data:[
-                    {value:335, name:'读书指数',itemStyle:{
-                      color:"rgba(35, 100, 158,1)",
-                    }},
-                    {value:310, name:'企业文化',itemStyle:{
-                      color:"#65B5C2",
-                    }},
-                    {value:234, name:'学习成长',itemStyle:{
-                      color:"#4DA7C1",
-                    }},
-                    {value:135, name:'精益改善',itemStyle:{
-                      color:"#2E7BAD",
-                    }},
-                    {value:154, name:'HSE',itemStyle:{
-                      color:"#2E7BAD",
-                    }},
-                    {value:310, name:'出勤指数',itemStyle:{
-                      color:"#23649E",
-                    }},
-                ],
-
-
-                itemStyle: {
-                    emphasis: {
-                        show: true,
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                        position: 'inner',
-                    },
-                    normal: {
-                        shadowBlur: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-
-                    }
-                },
-                labelLine: {
-                  normal: {
-                      smooth: 0.2,
-                      length: 1,
-                      length2: 5
-                  }
-                },
-            }
-        ]
-      });
       // 折线图
       myChart2.setOption({
         backgroundColor: '#fff',
@@ -315,7 +295,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['1', '2', '3', '4', '5', '6', '7','8','9','10','11','12',],
+          data: this.xAxisData,
           nameTextStyle:{
             fontWeight:100,
             fontSize:12,
@@ -344,31 +324,54 @@ export default {
         }]
       });
     },
+    getOrgInfo() {
+      const params = {}
+      params.month = '2018-11'
+     //本月企业名
+      this.$http.get('/huoli/mobile/orgInfo',{params: params}).then(({ data }) => {
+          if (data) {
+            this.deptList = data.dept
+            this.tagList = data.tag
+          } else {
+            this.$message({
+              type: 'error',
+              message: data.message
+            })
+          }
+       })
+    },
+    getAverData(deptId, groupId){
+      console.log(1111)
+      const params = {}
+      params.deptId = deptId
+      params.groupId = groupId
+      params.month = '2018-11'
+     //本月企业名
+      this.$http.get('/huoli/mobile/averData',{params: params}).then(({ data }) => {
+          if (data) {
+            this.tableData = data.rows
+          } else {
+            this.$message({
+              type: 'error',
+              message: data.message
+            })
+          }
+       })
+    },
     tabNum(index){
-      console.log(index)
-      if(index==0){
-        this.dataNum = this.dataNum1
-      }else if(index==1){
-        this.dataNum = this.dataNum2
-      }else if(index==2){
-        this.dataNum = this.dataNum3
-      }else if(index==3){
-        this.dataNum = this.dataNum4
-      }else if(index==4){
-        this.dataNum = this.dataNum5
-      }else if(index==5){
-        this.dataNum = this.dataNum6
-      }
+      this.dataNum = []
+      this.msHistoryData.forEach(item => {
+        if (item[index]) {
+          this.dataNum.push(item[index])
+        }
+      })
       this.drawLine();
     },
     handleCommand(command) {
-      this.tableData5 = this.tableData1
+      this.getAverData(command, null)
     },
     handleCommand2(command) {
-      this.tableData5 = this.tableData2
-    },
-    bang(){
-      this.tableData5 = this.tableData
+      this.getAverData(null, command)
     },
     //在<table>里，我们已经设置row的key值设置为每行数据id：row-key="id"
     rowClick(row, event, column) {
@@ -388,6 +391,71 @@ export default {
     }
   }
 }
+const myChart = [
+  {id:'read', value:0, name:'读书指数',itemStyle:{
+    color:"rgba(35, 100, 158,1)"
+  }},
+  {id:'read',value:0, name:'企业文化',itemStyle:{
+    color:"#65B5C2"
+  }},
+  {id:'culture',value:0, name:'学习成长',itemStyle:{
+    color:"#4DA7C1"
+  }},
+  {id:'improve',value:0, name:'精益改善',itemStyle:{
+    color:"#2E7BAD"
+  }},
+  {id:'hse',value:0, name:'HSE',itemStyle:{
+    color:"#2E7BAD"
+  }},
+  {id:'attendance',value:0, name:'出勤指数',itemStyle:{
+    color:"#23649E"
+  }}
+]
+const myChartSet = {
+    backgroundColor: '#fff',
+    title : {
+        text: '月活力指数比',
+        textStyle:{
+          fontSize:16,
+        },
+        left:15,
+        top:18
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+    },
+    series : [
+      {
+        name: '访问来源',
+        type: 'pie',
+        radius : '55%',
+        center: ['50%', '60%'],
+        data: [],
+        itemStyle: {
+            emphasis: {
+                show: true,
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+                position: 'inner',
+            },
+            normal: {
+                shadowBlur: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+
+            }
+        },
+        labelLine: {
+          normal: {
+              smooth: 0.2,
+              length: 1,
+              length2: 5
+          }
+        }
+      }
+    ]
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

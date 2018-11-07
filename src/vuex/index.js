@@ -6,7 +6,7 @@ Vue.use(Vuex)
 const state = {
   userInfo: {},
   login: false,
-  loginUuid: null
+  userid: null
 }
 const mutations = {
   setUserInfo (state, userInfo) {
@@ -17,13 +17,13 @@ const mutations = {
     }
     state.userInfo = userInfo || {}
   },
-  setLoginUuid (state, loginUuid) {
-    if (loginUuid) {
+  setUserid (state, userid) {
+    if (userid) {
       state.login = true
     } else {
       state.login = false
     }
-    state.loginUuid = loginUuid || null
+    state.userid = userid || null
   }
 }
 export default new Vuex.Store({

@@ -147,6 +147,7 @@ export default {
 
   },
   mounted(){
+    console.log(this.$route.query.code)
     this.codeId = this.$route.query.code
     this.getloadInfo()
     this.drawLine();
@@ -157,6 +158,7 @@ export default {
       params.codeId= this.codeId
       this.$http.get('/huoli/mobile/loadInfo', {params: params}).then(({ data }) => {
         if (data) {
+          console.log(data)
           if(data.userInfo){
             this.userInfo = data.userInfo
             this.$store.commit('setUserid', data.userid)

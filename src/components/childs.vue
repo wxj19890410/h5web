@@ -7,16 +7,12 @@
 			<span>我的指数明细</span>
 		</div>
 		<div style="width:100%;">
-		<el-table
-		    :data="tableData"
-		    stripe
-		    >
+			<el-table :data="tableData" stripe>
 		    <el-table-column
 		      prop="month"
 		      width="85%"
 		      label="日期">
 		    </el-table-column>
-
 		    <el-table-column
 		      prop="study"
 		      width="45%"
@@ -52,35 +48,35 @@
 		      width="45%"
 		      label="总指数">
 		    </el-table-column>
-		</el-table>
-		</div>
+			</el-table>
+			</div>
 	</div>
 </template>
 <script>
 export default {
-    data() {
-      return {
-        tableData: []
-      }
-    },
-    methods: {
-	    async initData () {
-	    	this.$http.get('/huoli/mobile/myHistoryData').then(({ data }) => {
-	            if (data) {
-                this.tableData = data
-	            } else {
-	              this.$message({
-	                type: 'error',
-	                message: data.message
-	              })
-	            }
-	         })
-	    }
+	data() {
+	  return {
+	    tableData: []
+	  }
+	},
+	methods: {
+		async initData () {
+			this.$http.get('/huoli/mobile/myHistoryData').then(({ data }) => {
+			  if (data) {
+			    this.tableData = data
+			  } else {
+			    this.$message({
+			      type: 'error',
+			      message: data.message
+			    })
+			  }
+			})
+		}
 	},
 	created () {
-	    this.initData()
-	 }
-  }
+	  this.initData()
+	}
+}
 </script>
 <style scoped>
 .top{height: 50px;width:100%;background-color: #4F77AB;font-size: 14px;color:#fff;line-height: 50px;position: relative;}

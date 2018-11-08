@@ -147,7 +147,7 @@ export default {
 
   },
   mounted(){
-    console.log(this.$route.query.code)
+    this.$store.commit('setUserid', '13906748021')
     this.codeId = this.$route.query.code
     this.getloadInfo()
     this.drawLine();
